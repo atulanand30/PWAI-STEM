@@ -1,82 +1,55 @@
+// src/pages/Learning.js
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import "../index.css";
 
 const subjects = [
   {
-    id: "science",
     name: "Science",
     icon: "🔬",
-    description: "Explore Physics, Chemistry, and Biology.",
+    description: "Explore physics, chemistry, biology lessons",
   },
   {
-    id: "technology",
-    name: "Technology",
-    icon: "💻",
-    description: "Learn about computers, coding, and AI.",
-  },
-  {
-    id: "engineering",
-    name: "Engineering",
-    icon: "⚙️",
-    description: "Discover how things are built and designed.",
-  },
-  {
-    id: "math",
     name: "Math",
     icon: "📐",
-    description: "Master algebra, geometry, and more.",
+    description: "Learn algebra, geometry, calculus and more",
+  },
+  {
+    name: "Technology",
+    icon: "💻",
+    description: "Dive into coding, AI and robotics",
+  },
+  {
+    name: "Engineering",
+    icon: "⚙️",
+    description: "Understand core engineering concepts",
   },
 ];
 
 const Learning = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-
-  const openLesson = (subjectId) => {
-    navigate(`/learning/${subjectId}`);
-  };
-
-  useEffect(() => {
-    // Simulating data fetch delay
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Loading subjects...</p>
-      </div>
-    );
-  }
 
   return (
-    <div className="learning-container">
-      {/* Header */}
-      <header className="learning-header">
-        <h1>📚 Choose a Subject</h1>
-        <p>Select a subject to start your learning journey</p>
+    <div className="min-h-screen bg-gradient-to-br from-[#0a1a2b] via-[#0b2236] to-black text-gray-200 p-6">
+      <header className="text-center mb-10">
+        <h1 className="text-4xl font-extrabold text-red-400">
+          Choose Your Subject
+        </h1>
+        <p className="text-gray-300">Interactive STEM lessons — even offline</p>
       </header>
 
-      {/* Subjects */}
-      <div className="subject-grid">
-        {subjects.map((subject) => (
+      <section className="max-w-6xl mx-auto grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {subjects.map((subj) => (
           <div
-            key={subject.id}
-            className="subject-card"
-            onClick={() => openLesson(subject.id)}
+            key={subj.name}
+            onClick={() => navigate(`/learning/${subj.name.toLowerCase()}`)}
+            className="bg-[#0f2942] border border-red-600/50 rounded-2xl p-6 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition cursor-pointer"
           >
-            <div className="subject-icon">{subject.icon}</div>
-            <h3>{subject.name}</h3>
-            <p>{subject.description}</p>
+            <span className="text-5xl">{subj.icon}</span>
+            <h3 className="text-xl font-bold mt-3 text-red-400">{subj.name}</h3>
+            <p className="text-gray-300 mt-1">{subj.description}</p>
           </div>
         ))}
-      </div>
+      </section>
     </div>
   );
 };

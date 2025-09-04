@@ -31,7 +31,6 @@ const Dashboard = () => {
       }
 
       try {
-        //Fetch from user's own document (safe rules allow this)
         const snap = await getDoc(doc(db, "users", user.uid));
         if (snap.exists()) {
           setUserName(snap.data().name || user.email);
@@ -40,7 +39,6 @@ const Dashboard = () => {
         }
       } catch (err) {
         console.error("Error fetching user:", err.message);
-        toast.error("⚠️ Failed to fetch profile data");
         setUserName(user.email);
       }
 
@@ -59,23 +57,45 @@ const Dashboard = () => {
     );
   }
 
+  // format join date
+  const joinDate = user?.metadata?.creationTime
+    ? new Date(user.metadata.creationTime).toLocaleDateString()
+    : "—";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1a2b] via-[#0b2236] to-black text-gray-200 p-6">
-      {/* Header */}
-      <header className="text-center mb-10">
-        <h1 className="text-4xl font-extrabold text-red-400">
+      {/* User Info Card */}
+      <div className="max-w-4xl mx-auto bg-[#0f2942] border border-red-600/50 rounded-2xl p-6 mb-8 shadow-lg">
+        <h1 className="text-3xl font-extrabold text-red-400">
           Welcome, {userName || "Learner"} 👋
         </h1>
         <p className="text-gray-300">
-          Ready to continue your learning journey?
+          Email: <span className="text-silver-300">{user?.email}</span>
         </p>
-        <button
-          onClick={handleLogout}
-          className="mt-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded transition"
-        >
-          Logout
-        </button>
-      </header>
+        <p className="text-gray-300">
+          Joined on: <span className="text-silver-300">{joinDate}</span>
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            onClick={() => navigate("/learning")}
+            className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition"
+          >
+            🚀 Start Learning
+          </button>
+          <button
+            onClick={() => navigate("/progress")}
+            className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition"
+          >
+            📊 View Progress
+          </button>
+          <button
+            onClick={handleLogout}
+            className="bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded transition"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
 
       {/* Cards */}
       <section className="max-w-6xl mx-auto grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
