@@ -7,6 +7,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import { AuthProvider } from "./context/AuthContext";
 import Learning from "./pages/Learning";
+import LessonList from "./pages/LessonList";
+import LessonContent from "./pages/LessonContent";
 
 // Toastify imports
 import { ToastContainer } from "react-toastify";
@@ -24,6 +26,11 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/learning" element={<Learning />} />
+          <Route path="/learning/:subject" element={<LessonList />} />
+          <Route
+            path="/learning/:subject/:lessonId"
+            element={<LessonContent />}
+          />
         </Routes>
 
         {/*  Toast container added once here */}
