@@ -18,11 +18,11 @@ const subjects = [
     icon: "💻",
     description: "Dive into coding, AI and robotics",
   },
-  {
-    name: "Engineering",
-    icon: "⚙️",
-    description: "Understand core engineering concepts",
-  },
+  // {
+  //   name: "Engineering",
+  //   icon: "⚙️",
+  //   description: "Understand core engineering concepts",
+  // },
 ];
 
 const Learning = () => {
@@ -37,7 +37,7 @@ const Learning = () => {
         <p className="text-gray-300">Interactive STEM lessons — even offline</p>
       </header>
 
-      <section className="max-w-6xl mx-auto grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="max-w-6xl mx-auto grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {subjects.map((subj) => (
           <div
             key={subj.name}

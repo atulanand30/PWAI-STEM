@@ -9,6 +9,8 @@ import { AuthProvider } from "./context/AuthContext";
 import Learning from "./pages/Learning";
 import LessonList from "./pages/LessonList";
 import LessonContent from "./pages/LessonContent";
+import Progress from "./pages/Progress";
+import Chatbot from "./pages/Chatbot";
 
 // Toastify imports
 import { ToastContainer } from "react-toastify";
@@ -31,6 +33,8 @@ function App() {
             path="/learning/:subject/:lessonId"
             element={<LessonContent />}
           />
+          <Route path="/progress" element={<Progress />} />
+          <Route path="/chatbot" element={<Chatbot />} />
         </Routes>
 
         {/*  Toast container added once here */}

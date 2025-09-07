@@ -4,6 +4,7 @@ import { db } from "../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { ProgressService } from "../services/progressService";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -12,40 +13,53 @@ const Dashboard = () => {
     user?.displayName || user?.email || ""
   );
   const [loading, setLoading] = useState(!user?.displayName);
+  const [progressStats, setProgressStats] = useState(null);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.info("👋 Logged out successfully");
-      navigate("/login");
-    } catch (e) {
-      toast.error("❌ Logout failed: " + e.message);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await logout();
+  //     toast.info("👋 Logged out successfully");
+  //     navigate("/login");
+  //   } catch (e) {
+  //     toast.error("❌ Logout failed: " + e.message);
+  //   }
+  // };
 
   useEffect(() => {
-    const fetchName = async () => {
+    const fetchUserData = async () => {
       if (!user) {
         setLoading(false);
         return;
       }
 
       try {
+        // Fetch user name
         const snap = await getDoc(doc(db, "users", user.uid));
         if (snap.exists()) {
           setUserName(snap.data().name || user.email);
         } else {
           setUserName(user.email);
         }
+
+        // Fetch progress stats
+        const stats = await ProgressService.getProgressStats(user.uid);
+        setProgressStats(stats);
       } catch (err) {
-        console.error("Error fetching user:", err.message);
+        console.error("Error fetching user data:", err.message);
         setUserName(user.email);
+        setProgressStats({
+          totalLessons: 12,
+          completedLessons: 0,
+          videosWatched: 0,
+          subjectProgress: {},
+          overallProgress: 0
+        });
       }
 
       setLoading(false);
     };
 
-    fetchName();
+    fetchUserData();
   }, [user]);
 
   if (loading) {
@@ -75,29 +89,38 @@ const Dashboard = () => {
         <p className="text-gray-300">
           Joined on: <span className="text-silver-300">{joinDate}</span>
         </p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate("/learning")}
-            className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition"
-          >
-            🚀 Start Learning
-          </button>
-          <button
-            onClick={() => navigate("/progress")}
-            className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition"
-          >
-            📊 View Progress
-          </button>
-          <button
-            onClick={handleLogout}
-            className="bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded transition"
-          >
-            Logout
-          </button>
-        </div>
+        
+        {/* Progress Overview */}
+        {progressStats && (
+          <div className="mt-6 bg-[#0a1a2b] rounded-xl p-4 border border-red-500/30">
+            <h2 className="text-xl font-bold text-red-400 mb-4">📊 Your Learning Progress</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-400">{progressStats.completedLessons}</div>
+                <div className="text-sm text-gray-400">Lessons Completed</div>
+                <div className="text-xs text-gray-500">out of {progressStats.totalLessons}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-400">{progressStats.videosWatched}</div>
+                <div className="text-sm text-gray-400">Videos Watched</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-400">{progressStats.overallProgress}%</div>
+                <div className="text-sm text-gray-400">Overall Progress</div>
+                <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                  <div 
+                    className="bg-gradient-to-r from-red-500 to-yellow-500 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${progressStats.overallProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Cards */}
+
+      {/* Action Cards */}
       <section className="max-w-6xl mx-auto grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <div
           onClick={() => navigate("/learning")}

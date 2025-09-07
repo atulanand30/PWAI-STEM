@@ -47,7 +47,7 @@ const AppHome = () => {
           <img
             src="https://cdn-icons-png.flaticon.com/512/2910/2910768.png"
             alt=""
-            className="w-14 mb-4"
+            className="w-14 mb-4 fill-white"
           />
           <h3 className="text-xl font-bold text-red-400">STEM Learning</h3>
           <p className="text-gray-300 mt-1">
