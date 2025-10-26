@@ -39,7 +39,7 @@ const Progress = () => {
             science: { completed: 0, videosWatched: 0, total: 3, progress: 0 },
             math: { completed: 0, videosWatched: 0, total: 3, progress: 0 },
             technology: { completed: 0, videosWatched: 0, total: 3, progress: 0 },
-            engineering: { completed: 0, videosWatched: 0, total: 3, progress: 0 }
+            // engineering: { completed: 0, videosWatched: 0, total: 3, progress: 0 }
           },
           overallProgress: 0
         });
@@ -83,7 +83,7 @@ const Progress = () => {
     { key: 'science', name: 'Science', icon: '🧪', color: 'text-green-400' },
     { key: 'math', name: 'Mathematics', icon: '📘', color: 'text-blue-400' },
     { key: 'technology', name: 'Technology', icon: '💻', color: 'text-purple-400' },
-    { key: 'engineering', name: 'Engineering', icon: '⚙️', color: 'text-yellow-400' }
+    // { key: 'engineering', name: 'Engineering', icon: '⚙️', color: 'text-yellow-400' }
   ];
 
   const lessonNames = {
@@ -163,14 +163,14 @@ const Progress = () => {
                 const subjectIcons = {
                   science: "🧪",
                   math: "📘", 
-                  technology: "💻",
-                  engineering: "⚙️"
+                  technology: "💻"
+                  /* engineering: "⚙️" */
                 };
                 const subjectNames = {
                   science: "Science",
                   math: "Mathematics",
-                  technology: "Technology", 
-                  engineering: "Engineering"
+                  technology: "Technology" 
+                  /* engineering: "Engineering" */
                 };
                 
                 return (

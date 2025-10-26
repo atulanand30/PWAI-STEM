@@ -43,7 +43,7 @@ const AppHome = () => {
 
       {/* Features */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 pb-16 grid gap-6 grid-cols-1 md:grid-cols-3">
-        <div className="bg-[#0f2942] border border-red-600/50 rounded-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition">
+        <div className="bg-[#0f2942] border border-red-600/50 rounded-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition cursor-pointer">
           <img
             src="https://cdn-icons-png.flaticon.com/512/2910/2910768.png"
             alt=""
@@ -54,7 +54,7 @@ const AppHome = () => {
             Interactive Science, Technology, Engineering, and Math lessons.
           </p>
         </div>
-        <div className="bg-[#0f2942] border border-red-600/50 rounded-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition">
+        <div className="bg-[#0f2942] border border-red-600/50 rounded-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition cursor-pointer">
           <img
             src="https://cdn-icons-png.flaticon.com/512/942/942748.png"
             alt=""
@@ -65,7 +65,7 @@ const AppHome = () => {
             Visualize your growth and celebrate milestones.
           </p>
         </div>
-        <div className="bg-[#0f2942] border border-red-600/50 rounded-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition">
+        <div className="bg-[#0f2942] border border-red-600/50 rounded-xl p-6 hover:-translate-y-1 hover:shadow-2xl transition cursor-pointer">
           <img
             src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png"
             alt=""
