@@ -1,37 +1,109 @@
 import { db } from './firebase';
-import { doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, setDoc, getDoc} from 'firebase/firestore';
 
 // Progress tracking service
 export class ProgressService {
+  static COLLECTION_NAME = 'userProgress';
+  
+  static async initializeUserProgress(userId) {
+    try {
+      if (!userId) {
+        console.error('User ID is required to initialize progress');
+        return false;
+      }
+      
+      const progressRef = doc(db, this.COLLECTION_NAME, userId);
+      const progressDoc = await getDoc(progressRef);
+      
+      if (!progressDoc.exists()) {
+        const initialData = {
+          userId: userId, // Explicitly store userId in the document
+          science: {},
+          math: {},
+          technology: {},
+          engineering: {},
+          initialized: true,
+          createdAt: new Date().toISOString(),
+          lastUpdated: new Date().toISOString()
+        };
+        await setDoc(progressRef, initialData);
+        console.log(`Initialized user progress document for user: ${userId}`);
+        return true;
+      } else {
+        // Ensure existing documents also have userId (for migration)
+        const existingData = progressDoc.data();
+        if (!existingData.userId) {
+          await setDoc(progressRef, { ...existingData, userId: userId }, { merge: true });
+          console.log(`Updated existing progress document with userId: ${userId}`);
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error('Error initializing user progress:', error);
+      return false;
+    }
+  }
   // Mark a lesson as completed
   static async markLessonCompleted(userId, subject, lessonId) {
     try {
-      const progressRef = doc(db, 'userProgress', userId);
-      const progressDoc = await getDoc(progressRef);
-      
-      if (progressDoc.exists()) {
-        // Update existing progress
-        await updateDoc(progressRef, {
-          [`${subject}.${lessonId}`]: {
-            completed: true,
-            completedAt: new Date().toISOString(),
-            videoWatched: true
-          }
-        });
-      } else {
-        // Create new progress document
-        await setDoc(progressRef, {
-          [`${subject}.${lessonId}`]: {
-            completed: true,
-            completedAt: new Date().toISOString(),
-            videoWatched: true
-          }
-        });
+      if (!userId) {
+        console.error('User ID is required');
+        return false;
       }
+      
+      // First ensure user progress document exists
+      await this.initializeUserProgress(userId);
+      
+      const normalizedSubject = subject.toLowerCase();
+      const progressRef = doc(db, this.COLLECTION_NAME, userId);
+      
+      // Get current document
+      const progressDoc = await getDoc(progressRef);
+      const currentData = progressDoc.exists() ? progressDoc.data() : {};
+      
+      // Ensure userId is always in the document
+      if (!currentData.userId) {
+        currentData.userId = userId;
+      }
+      
+      // Ensure subject structure exists
+      if (!currentData[normalizedSubject]) {
+        currentData[normalizedSubject] = {};
+      }
+      
+      // Merge lesson data (preserve existing fields like videoWatched if already set)
+      currentData[normalizedSubject][lessonId] = {
+        ...(currentData[normalizedSubject][lessonId] || {}),
+        completed: true,
+        completedAt: new Date().toISOString(),
+        videoWatched: true,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      // Always update userId and lastUpdated timestamp
+      currentData.userId = userId;
+      currentData.lastUpdated = new Date().toISOString();
+      
+      // Update the document using setDoc
+      await setDoc(progressRef, currentData, { merge: false });
+      
+      console.log(`Lesson marked as completed for ${normalizedSubject} lesson ${lessonId}`);
+      console.log('Updated data:', currentData[normalizedSubject][lessonId]);
+      console.log('User ID:', userId);
       
       return true;
     } catch (error) {
       console.error('Error marking lesson as completed:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('User ID:', userId);
+      
+      // Check if it's a permission error
+      if (error.code === 'permission-denied' || error.code === 'PERMISSION_DENIED') {
+        console.error('⚠️ Permission denied. Make sure Firestore security rules are deployed.');
+        console.error('See FIREBASE_SETUP.md for instructions.');
+      }
+      
       return false;
     }
   }
@@ -39,27 +111,74 @@ export class ProgressService {
   // Mark a video as watched
   static async markVideoWatched(userId, subject, lessonId) {
     try {
-      const progressRef = doc(db, 'userProgress', userId);
-      const progressDoc = await getDoc(progressRef);
+      if (!userId) {
+        console.error('User ID is required');
+        return false;
+      }
       
-      if (progressDoc.exists()) {
-        await updateDoc(progressRef, {
-          [`${subject}.${lessonId}.videoWatched`]: true,
-          [`${subject}.${lessonId}.videoWatchedAt`]: new Date().toISOString()
-        });
-      } else {
-        await setDoc(progressRef, {
-          [`${subject}.${lessonId}`]: {
-            videoWatched: true,
-            videoWatchedAt: new Date().toISOString(),
-            completed: false
-          }
-        });
+      // First ensure user progress document exists
+      await this.initializeUserProgress(userId);
+      
+      const normalizedSubject = subject.toLowerCase();
+      const progressRef = doc(db, this.COLLECTION_NAME, userId);
+      
+      // Get current document
+      const progressDoc = await getDoc(progressRef);
+      const currentData = progressDoc.exists() ? progressDoc.data() : {};
+      
+      // Ensure userId is always in the document
+      if (!currentData.userId) {
+        currentData.userId = userId;
+      }
+      
+      // Ensure subject structure exists
+      if (!currentData[normalizedSubject]) {
+        currentData[normalizedSubject] = {};
+      }
+      
+      // Merge lesson data (preserve existing fields like completed if already set)
+      currentData[normalizedSubject][lessonId] = {
+        ...(currentData[normalizedSubject][lessonId] || {}),
+        videoWatched: true,
+        videoWatchedAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString()
+      };
+      
+      // Always update userId and lastUpdated timestamp
+      currentData.userId = userId;
+      currentData.lastUpdated = new Date().toISOString();
+      
+      // Update the document
+      await setDoc(progressRef, currentData, { merge: false });
+      
+      console.log(`Video marked as watched for ${normalizedSubject} lesson ${lessonId}`);
+      console.log('Updated data:', currentData[normalizedSubject][lessonId]);
+      console.log('User ID:', userId);
+      
+      // Verify the update
+      const verifyDoc = await getDoc(progressRef);
+      const verifyData = verifyDoc.data();
+      const isUpdated = verifyData?.[normalizedSubject]?.[lessonId]?.videoWatched === true;
+      
+      if (!isUpdated) {
+        console.error('Failed to verify video watched status update');
+        console.error('Verification data:', verifyData);
+        return false;
       }
       
       return true;
     } catch (error) {
       console.error('Error marking video as watched:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('User ID:', userId);
+      
+      // Check if it's a permission error
+      if (error.code === 'permission-denied' || error.code === 'PERMISSION_DENIED') {
+        console.error('⚠️ Permission denied. Make sure Firestore security rules are deployed.');
+        console.error('See FIREBASE_SETUP.md for instructions.');
+      }
+      
       return false;
     }
   }
@@ -67,28 +186,64 @@ export class ProgressService {
   // Get user progress
   static async getUserProgress(userId) {
     try {
-      const progressRef = doc(db, 'userProgress', userId);
+      if (!userId) {
+        console.error('User ID is required to get progress');
+        throw new Error('User ID is required');
+      }
+      
+      // Initialize if needed
+      await this.initializeUserProgress(userId);
+      
+      const progressRef = doc(db, this.COLLECTION_NAME, userId);
       const progressDoc = await getDoc(progressRef);
       
       if (progressDoc.exists()) {
-        return progressDoc.data();
+        const data = progressDoc.data();
+        
+        // Validate that the document belongs to the requested user
+        if (data.userId && data.userId !== userId) {
+          console.error(`User ID mismatch! Document userId: ${data.userId}, requested: ${userId}`);
+          throw new Error('Progress document belongs to a different user');
+        }
+        
+        // Ensure userId is in the returned data
+        const progressData = { ...data, userId: userId };
+        console.log(`Retrieved user progress for user: ${userId}`, progressData);
+        return progressData;
       } else {
-        return {};
+        console.log(`No progress document found for user: ${userId}`);
+        return { userId: userId };
       }
     } catch (error) {
       console.error('Error getting user progress:', error);
-      return {};
+      throw error; // Propagate error to handle it in the component
     }
   }
 
   // Get progress statistics
   static async getProgressStats(userId) {
     try {
+      if (!userId) {
+        console.error('User ID is required to get progress stats');
+        throw new Error('User ID is required');
+      }
+      
       const progress = await this.getUserProgress(userId);
+      
+      // Validate userId in progress data
+      if (progress.userId && progress.userId !== userId) {
+        console.error(`User ID mismatch in progress stats! Expected: ${userId}, Got: ${progress.userId}`);
+        throw new Error('Progress data does not match requested user');
+      }
+      
+      // Ensure subjects match the normalized case in storage
       const subjects = ['science', 'math', 'technology', 'engineering'];
       const lessonsPerSubject = 3; // Introduction, Basic, Advanced
       
+      console.log(`Current progress for user ${userId}:`, progress); // Debug logging
+      
       const stats = {
+        userId: userId, // Include userId in stats for clarity
         totalLessons: subjects.length * lessonsPerSubject,
         completedLessons: 0,
         videosWatched: 0,
@@ -105,8 +260,9 @@ export class ProgressService {
         };
 
         for (let lessonId = 1; lessonId <= lessonsPerSubject; lessonId++) {
-          const lessonKey = `${subject}.${lessonId}`;
-          const lessonData = progress[lessonKey];
+          // Access nested structure: progress[subject][lessonId]
+          const subjectData = progress[subject];
+          const lessonData = subjectData && subjectData[lessonId] ? subjectData[lessonId] : null;
           
           if (lessonData) {
             if (lessonData.completed) {
@@ -144,9 +300,37 @@ export class ProgressService {
   // Check if lesson is completed
   static async isLessonCompleted(userId, subject, lessonId) {
     try {
+      if (!userId) {
+        console.error('User ID is required to check lesson completion');
+        return false;
+      }
+      
       const progress = await this.getUserProgress(userId);
-      const lessonKey = `${subject}.${lessonId}`;
-      return progress[lessonKey]?.completed || false;
+      
+      // Validate userId
+      if (progress.userId && progress.userId !== userId) {
+        console.error(`User ID mismatch! Expected: ${userId}, Got: ${progress.userId}`);
+        return false;
+      }
+      
+      const normalizedSubject = subject.toLowerCase();
+
+      // Check if the data exists in the correct structure
+      const subjectData = progress[normalizedSubject];
+      if (!subjectData) {
+        console.log(`No data found for subject: ${normalizedSubject} for user: ${userId}`);
+        return false;
+      }
+
+      const lessonData = subjectData[lessonId];
+      if (!lessonData) {
+        console.log(`No data found for lesson: ${lessonId} in subject: ${normalizedSubject} for user: ${userId}`);
+        return false;
+      }
+
+      const isCompleted = lessonData.completed || false;
+      console.log(`Lesson completion status for user ${userId}, ${normalizedSubject}/${lessonId}: ${isCompleted}`);
+      return isCompleted;
     } catch (error) {
       console.error('Error checking lesson completion:', error);
       return false;
@@ -156,9 +340,37 @@ export class ProgressService {
   // Check if video is watched
   static async isVideoWatched(userId, subject, lessonId) {
     try {
+      if (!userId) {
+        console.error('User ID is required to check video watch status');
+        return false;
+      }
+      
       const progress = await this.getUserProgress(userId);
-      const lessonKey = `${subject}.${lessonId}`;
-      return progress[lessonKey]?.videoWatched || false;
+      
+      // Validate userId
+      if (progress.userId && progress.userId !== userId) {
+        console.error(`User ID mismatch! Expected: ${userId}, Got: ${progress.userId}`);
+        return false;
+      }
+      
+      const normalizedSubject = subject.toLowerCase();
+      
+      // Check if the data exists in the correct structure
+      const subjectData = progress[normalizedSubject];
+      if (!subjectData) {
+        console.log(`No data found for subject: ${normalizedSubject} for user: ${userId}`);
+        return false;
+      }
+
+      const lessonData = subjectData[lessonId];
+      if (!lessonData) {
+        console.log(`No data found for lesson: ${lessonId} in subject: ${normalizedSubject} for user: ${userId}`);
+        return false;
+      }
+
+      const isWatched = lessonData.videoWatched || false;
+      console.log(`Video watched status for user ${userId}, ${normalizedSubject}/${lessonId}: ${isWatched}`);
+      return isWatched;
     } catch (error) {
       console.error('Error checking video watch status:', error);
       return false;

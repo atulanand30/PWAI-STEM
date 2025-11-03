@@ -40,13 +40,23 @@ const LessonContent = () => {
       if (!user) return;
       
       try {
+        // Initialize progress document if needed
+        await ProgressService.initializeUserProgress(user.uid);
+        
+        // Get progress status
         const videoWatched = await ProgressService.isVideoWatched(user.uid, subject.toLowerCase(), current);
         const lessonCompleted = await ProgressService.isLessonCompleted(user.uid, subject.toLowerCase(), current);
+        
+        console.log(`Progress check for ${subject.toLowerCase()} lesson ${current}:`, {
+          videoWatched,
+          lessonCompleted
+        });
         
         setIsVideoWatched(videoWatched);
         setIsLessonCompleted(lessonCompleted);
       } catch (error) {
         console.error("Error checking progress:", error);
+        toast.error("Failed to load progress status");
       }
     };
 
@@ -61,9 +71,21 @@ const LessonContent = () => {
     }
 
     try {
-      await ProgressService.markVideoWatched(user.uid, subject.toLowerCase(), current);
-      setIsVideoWatched(true);
-      toast.success("📹 Video marked as watched!");
+      const success = await ProgressService.markVideoWatched(user.uid, subject.toLowerCase(), current);
+      if (success) {
+        setIsVideoWatched(true);
+        toast.success("📹 Video marked as watched!");
+        
+        // Verify the status was updated
+        const verified = await ProgressService.isVideoWatched(user.uid, subject.toLowerCase(), current);
+        if (!verified) {
+          console.error("Video watched status verification failed");
+          toast.error("Failed to verify progress update");
+          setIsVideoWatched(false);
+        }
+      } else {
+        toast.error("Failed to update progress");
+      }
     } catch (error) {
       console.error("Error marking video as watched:", error);
       toast.error("Failed to update progress");
@@ -78,12 +100,24 @@ const LessonContent = () => {
     }
 
     try {
-      await ProgressService.markLessonCompleted(user.uid, subject.toLowerCase(), current);
-      setIsLessonCompleted(true);
-      toast.success("🎉 Lesson marked as completed!");
+      const success = await ProgressService.markLessonCompleted(user.uid, subject.toLowerCase(), current);
+      if (success) {
+        setIsLessonCompleted(true);
+        toast.success("🎉 Lesson marked as completed!");
+        
+        // Verify the status was updated
+        const verified = await ProgressService.isLessonCompleted(user.uid, subject.toLowerCase(), current);
+        if (!verified) {
+          console.error("Lesson completion status verification failed");
+          toast.error("Failed to verify progress update");
+          setIsLessonCompleted(false);
+        }
+      } else {
+        toast.error("Failed to update progress");
+      }
     } catch (error) {
       console.error("Error marking lesson as completed:", error);
-      toast.error("Failed to update progress");
+      toast.error("Failed to update progress: " + (error.message || "Unknown error"));
     }
   };
 

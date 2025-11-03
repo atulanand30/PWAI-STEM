@@ -1,11 +1,12 @@
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { ProgressService } from "../services/progressService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Progress = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [progressStats, setProgressStats] = useState(null);
   const [detailedProgress, setDetailedProgress] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,20 @@ const Progress = () => {
     };
 
     fetchProgress();
-  }, [user]);
+    
+    // Add event listener to refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchProgress();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user, location.pathname]); // Refresh when location changes
 
   if (loading) {
     return (
@@ -229,8 +243,9 @@ const Progress = () => {
 
                 <div className="space-y-3">
                   {[1, 2, 3].map(lessonId => {
-                    const lessonKey = `${subject.key}.${lessonId}`;
-                    const lessonData = detailedProgress[lessonKey];
+                    // Access nested structure: detailedProgress[subject][lessonId]
+                    const subjectData = detailedProgress[subject.key];
+                    const lessonData = subjectData && subjectData[lessonId] ? subjectData[lessonId] : null;
                     const isCompleted = lessonData?.completed || false;
                     const isVideoWatched = lessonData?.videoWatched || false;
 
