@@ -60,3 +60,5 @@ If you see permission errors:
 3. Verify the user ID matches the document ID in Firestore
 4. Check browser console for specific error messages
 
+
+

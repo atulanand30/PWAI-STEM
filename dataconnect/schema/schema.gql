@@ -1,0 +1,40 @@
+type User @table {
+  displayName: String!
+  createdAt: Timestamp!
+  email: String
+  photoUrl: String
+}
+
+type Subject @table {
+  name: String!
+  createdAt: Timestamp!
+  description: String
+  thumbnailUrl: String
+}
+
+type Lecture @table {
+  subject: Subject!
+  title: String!
+  order: Int!
+  content: String!
+  createdAt: Timestamp!
+  videoUrl: String
+  imageUrl: String
+}
+
+type Progress @table(key: ["user", "lecture"]) {
+  user: User!
+  lecture: Lecture!
+  isCompleted: Boolean!
+  completedAt: Timestamp!
+}
+
+type RoadmapStep @table {
+  user: User!
+  subject: Subject!
+  description: String!
+  stepOrder: Int!
+  createdAt: Timestamp!
+  linkedLectureId: UUID
+  isCompleted: Boolean
+}

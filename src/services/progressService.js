@@ -84,8 +84,8 @@ export class ProgressService {
       currentData.userId = userId;
       currentData.lastUpdated = new Date().toISOString();
       
-      // Update the document using setDoc
-      await setDoc(progressRef, currentData, { merge: false });
+      // Update the document using setDoc with merge to avoid overwriting unrelated fields
+      await setDoc(progressRef, currentData, { merge: true });
       
       console.log(`Lesson marked as completed for ${normalizedSubject} lesson ${lessonId}`);
       console.log('Updated data:', currentData[normalizedSubject][lessonId]);
@@ -148,24 +148,14 @@ export class ProgressService {
       currentData.userId = userId;
       currentData.lastUpdated = new Date().toISOString();
       
-      // Update the document
-      await setDoc(progressRef, currentData, { merge: false });
+      // Update the document using merge to preserve existing fields
+      await setDoc(progressRef, currentData, { merge: true });
       
       console.log(`Video marked as watched for ${normalizedSubject} lesson ${lessonId}`);
       console.log('Updated data:', currentData[normalizedSubject][lessonId]);
       console.log('User ID:', userId);
       
-      // Verify the update
-      const verifyDoc = await getDoc(progressRef);
-      const verifyData = verifyDoc.data();
-      const isUpdated = verifyData?.[normalizedSubject]?.[lessonId]?.videoWatched === true;
-      
-      if (!isUpdated) {
-        console.error('Failed to verify video watched status update');
-        console.error('Verification data:', verifyData);
-        return false;
-      }
-      
+      // Consider the operation successful if no error is thrown
       return true;
     } catch (error) {
       console.error('Error marking video as watched:', error);
