@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import InstallPrompt from "./InstallPrompt";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -45,6 +46,7 @@ export default function Navbar() {
                 <Link to="/dashboard" className="hover:text-red-400 transition">
                   Dashboard
                 </Link>
+                <InstallPrompt />
                 <button
                   onClick={handleLogout}
                   className="bg-red-600 hover:bg-red-700 px-4 py-1 rounded text-white transition"
@@ -63,6 +65,7 @@ export default function Navbar() {
                 >
                   Register
                 </Link>
+                <InstallPrompt />
               </>
             )}
           </div>
@@ -98,6 +101,9 @@ export default function Navbar() {
               >
                 Dashboard
               </Link>
+              <div onClick={() => setMenuOpen(false)}>
+                <InstallPrompt />
+              </div>
               <button
                 onClick={() => {
                   handleLogout();
@@ -124,6 +130,9 @@ export default function Navbar() {
               >
                 Register
               </Link>
+              <div onClick={() => setMenuOpen(false)}>
+                <InstallPrompt />
+              </div>
             </>
           )}
         </div>

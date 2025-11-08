@@ -8,23 +8,26 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "logo512.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#dc2626",
   "background_color": "#0f172a",
   "orientation": "portrait",
   "scope": "/",
-  "description": "Interactive STEM learning platform with offline support"
+  "description": "Interactive STEM learning platform with offline support",
+  "categories": ["education", "learning", "stem"],
+  "screenshots": [],
+  "prefer_related_applications": false
 }

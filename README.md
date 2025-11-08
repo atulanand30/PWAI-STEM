@@ -1,4 +1,36 @@
-# Getting Started with Create React App
+# PWAI STEM - Progressive Web App
+
+A Progressive Web App (PWA) for STEM learning with offline support, AI-powered chatbot, and progress tracking.
+
+## 🌟 Features
+
+- **Progressive Web App**: Install and use offline
+- **STEM Learning**: Interactive lessons in Science, Technology, Engineering, and Math
+- **AI Chatbot**: Get instant help with your questions
+- **Progress Tracking**: Monitor your learning journey
+- **Offline Support**: Continue learning even without internet
+
+## 📱 Installing the App
+
+### Desktop (Chrome/Edge)
+1. Visit the website
+2. Look for the "Install App" button in the navigation bar or home page
+3. Click "Install App" when prompted
+4. The app will be added to your home screen/applications
+
+### Mobile (Android)
+1. Visit the website in Chrome
+2. Tap the menu (three dots) → "Install app" or "Add to Home screen"
+3. Confirm the installation
+4. The app will appear on your home screen
+
+### iOS (Safari)
+1. Visit the website in Safari
+2. Tap the Share button
+3. Scroll down and tap "Add to Home Screen"
+4. The app will appear on your home screen
+
+## 🚀 Getting Started
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

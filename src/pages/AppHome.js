@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import InstallPrompt from "../components/InstallPrompt";
 
 const AppHome = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const AppHome = () => {
           <p className="mt-4 text-lg text-gray-300">
             Personalized STEM learning, offline friendly, with instant AI help.
           </p>
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6 flex flex-wrap gap-3">
             <button
               onClick={() => navigate(user ? "/dashboard" : "/login")}
               className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition"
@@ -29,6 +30,9 @@ const AppHome = () => {
             >
               Create Account
             </button>
+            <div className="flex items-center">
+              <InstallPrompt />
+            </div>
           </div>
         </div>
 
