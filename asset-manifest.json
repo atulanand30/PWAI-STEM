@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/PWAI-STEM/static/css/main.e3a1c47a.css",
+    "main.js": "/PWAI-STEM/static/js/main.2c92868d.js",
+    "index.html": "/PWAI-STEM/index.html",
+    "main.e3a1c47a.css.map": "/PWAI-STEM/static/css/main.e3a1c47a.css.map",
+    "main.2c92868d.js.map": "/PWAI-STEM/static/js/main.2c92868d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e3a1c47a.css",
+    "static/js/main.2c92868d.js"
+  ]
+}
